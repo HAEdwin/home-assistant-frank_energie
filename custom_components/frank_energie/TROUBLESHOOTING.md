@@ -21,7 +21,14 @@
 - Improved logging to help debug authentication and API issues
 - Added fallback behavior when site information cannot be retrieved initially
 
-### 4. Better Authentication Flow
+### 4. Improved Config Flow and Authentication
+- Enhanced config flow with better error handling for authentication failures
+- Added proper type annotations and documentation to improve code quality
+- Improved reauth flow to handle expired tokens more gracefully  
+- Added better parameter handling in config flow methods
+- Enhanced logging in authentication steps to help debug login issues
+
+### 5. Better Authentication Flow
 - Authentication errors now trigger proper reauth flows instead of hard failures
 - More informative error messages for debugging
 - Graceful handling of temporary API issues
@@ -85,6 +92,44 @@
 1. The integration has been updated to handle this change gracefully
 2. If you continue to see this error, restart Home Assistant to ensure the new code is loaded
 3. The integration will still work by using public prices instead of user-specific prices
+
+### Configuration Flow Issues
+**Symptoms:** Errors during initial setup or reconfiguration of the integration
+
+**Possible Causes:**
+- Network connectivity issues during authentication
+- Invalid credentials
+- Frank Energie API changes affecting the login process
+
+**Solutions:**
+1. **Verify your credentials:**
+   - Ensure your username and password are correct
+   - Test logging in to the Frank Energie website directly
+   
+2. **Check network connectivity:**
+   - Ensure Home Assistant can reach the Frank Energie API
+   - Check for any firewall or proxy issues
+   
+3. **Try the authentication flow again:**
+   - The config flow now has better error handling and will provide more specific error messages
+   - Look for specific error messages in the configuration UI
+
+4. **Use public pricing mode:**
+   - If authentication continues to fail, you can set up the integration without authentication
+   - This will provide public pricing data instead of user-specific pricing
+
+### Authentication Flow Improvements
+**Recent Changes:**
+- Enhanced error handling in the login process
+- Better type annotations and parameter handling
+- Improved reauth flow when tokens expire
+- More descriptive error messages during configuration
+
+**Benefits:**
+- More reliable authentication process
+- Better user experience during setup
+- Clearer error messages when authentication fails
+- Graceful handling of expired tokens
 
 ### Dependency Conflicts
 **Symptoms:** Error message about dependency resolution failures, "requests" version conflicts
