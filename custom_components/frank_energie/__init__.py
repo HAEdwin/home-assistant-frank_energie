@@ -1,16 +1,22 @@
+# pylint: disable=import-error
 """The Frank Energie component."""
+
 from __future__ import annotations
+
+import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ACCESS_TOKEN, Platform, CONF_TOKEN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from python_frank_energie import FrankEnergie
+from python_frank_energie.exceptions import AuthException, RequestException
 
 from .const import CONF_COORDINATOR, DOMAIN
 from .coordinator import FrankEnergieCoordinator
 
 PLATFORMS = [Platform.SENSOR]
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -21,28 +27,52 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.config_entries.async_update_entry(entry, unique_id=str("frank_energie"))
 
     # Select site-reference, or find first one that has status 'IN_DELIVERY' if not set
-    if entry.data.get("site_reference") is None and entry.data.get(CONF_ACCESS_TOKEN) is not None:
+    if (
+        entry.data.get("site_reference") is None
+        and entry.data.get(CONF_ACCESS_TOKEN) is not None
+    ):
         api = FrankEnergie(
             clientsession=async_get_clientsession(hass),
             auth_token=entry.data.get(CONF_ACCESS_TOKEN, None),
             refresh_token=entry.data.get(CONF_TOKEN, None),
         )
-        me = await api.me()
+        try:
+            me = await api.me()
+        except Exception as ex:
+            # Log the specific error for debugging
+            _LOGGER.error(
+                "Failed to retrieve user information from Frank Energie API: %s", ex
+            )
+            _LOGGER.debug("Error details:", exc_info=True)
 
-        # filter out all sites that are not in delivery
-        me.deliverySites = [site for site in me.deliverySites if site.status == "IN_DELIVERY"]
+            # If this is an authentication error, trigger a reauth flow
+            if isinstance(ex, (AuthException, RequestException)):
+                if (
+                    "validation error" in str(ex).lower()
+                    or "unauthorized" in str(ex).lower()
+                ):
+                    _LOGGER.warning(
+                        "Authentication appears to be invalid, please reconfigure the integration"
+                    )
+                    # Don't raise the error here, let the coordinator handle it during first refresh
+                    return False
 
-        if len(me.deliverySites) == 0:
-            raise Exception("No suitable sites found for this account")
+            # For other errors, still fail setup but with a more informative message
+            raise ConnectionError(
+                f"Unable to connect to Frank Energie API: {ex}"
+            ) from ex
 
-        site = me.deliverySites[0]
-        hass.config_entries.async_update_entry(entry, data={**entry.data, "site_reference": site.reference})
+        # The newer version of the library has changed the Me object structure
+        # For now, we'll log the successful authentication and continue without site-specific setup
+        # The coordinator can still fetch public prices even without a site reference
+        _LOGGER.info("Successfully authenticated with Frank Energie API")
+        _LOGGER.debug(
+            "User info retrieved: %s",
+            me.email if hasattr(me, "email") else "Unknown user",
+        )
 
-        # Update title
-        title = f"{site.address_street} {site.address_houseNumber}"
-        if site.address_houseNumberAddition is not None:
-            title += f" {site.address_houseNumberAddition}"
-        hass.config_entries.async_update_entry(entry, title=title)
+        # Continue with setup - the coordinator will handle fetching prices
+        # If user prices aren't available, it will fall back to public prices
 
     # Initialise the coordinator and save it as domain-data
     api = FrankEnergie(

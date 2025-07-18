@@ -1,4 +1,6 @@
+# pylint: disable=import-error,unexpected-keyword-arg
 """Frank Energie current electricity and gas price information service."""
+
 from __future__ import annotations
 
 import logging
@@ -218,12 +220,16 @@ SENSOR_TYPES: tuple[FrankEnergieEntityDescription, ...] = (
         native_unit_of_measurement=CURRENCY_EURO,
         authenticated=True,
         service_name=SERVICE_NAME_COSTS,
-        value_fn=lambda data: data[
-            DATA_MONTH_SUMMARY
-        ].actualCostsUntilLastMeterReadingDate,
-        attr_fn=lambda data: {
-            "Last update": data[DATA_MONTH_SUMMARY].lastMeterReadingDate
-        },
+        value_fn=lambda data: (
+            data[DATA_MONTH_SUMMARY].actualCostsUntilLastMeterReadingDate
+            if data[DATA_MONTH_SUMMARY] is not None
+            else None
+        ),
+        attr_fn=lambda data: (
+            {"Last update": data[DATA_MONTH_SUMMARY].lastMeterReadingDate}
+            if data[DATA_MONTH_SUMMARY] is not None
+            else {}
+        ),
     ),
     FrankEnergieEntityDescription(
         key="expected_costs_until_last_meter_reading_date",
@@ -233,12 +239,16 @@ SENSOR_TYPES: tuple[FrankEnergieEntityDescription, ...] = (
         native_unit_of_measurement=CURRENCY_EURO,
         authenticated=True,
         service_name=SERVICE_NAME_COSTS,
-        value_fn=lambda data: data[
-            DATA_MONTH_SUMMARY
-        ].expectedCostsUntilLastMeterReadingDate,
-        attr_fn=lambda data: {
-            "Last update": data[DATA_MONTH_SUMMARY].lastMeterReadingDate
-        },
+        value_fn=lambda data: (
+            data[DATA_MONTH_SUMMARY].expectedCostsUntilLastMeterReadingDate
+            if data[DATA_MONTH_SUMMARY] is not None
+            else None
+        ),
+        attr_fn=lambda data: (
+            {"Last update": data[DATA_MONTH_SUMMARY].lastMeterReadingDate}
+            if data[DATA_MONTH_SUMMARY] is not None
+            else {}
+        ),
     ),
     FrankEnergieEntityDescription(
         key="expected_costs_this_month",
@@ -248,7 +258,11 @@ SENSOR_TYPES: tuple[FrankEnergieEntityDescription, ...] = (
         native_unit_of_measurement=CURRENCY_EURO,
         authenticated=True,
         service_name=SERVICE_NAME_COSTS,
-        value_fn=lambda data: data[DATA_MONTH_SUMMARY].expectedCosts,
+        value_fn=lambda data: (
+            data[DATA_MONTH_SUMMARY].expectedCosts
+            if data[DATA_MONTH_SUMMARY] is not None
+            else None
+        ),
     ),
     FrankEnergieEntityDescription(
         key="invoice_previous_period",
@@ -258,13 +272,23 @@ SENSOR_TYPES: tuple[FrankEnergieEntityDescription, ...] = (
         native_unit_of_measurement=CURRENCY_EURO,
         authenticated=True,
         service_name=SERVICE_NAME_COSTS,
-        value_fn=lambda data: data[DATA_INVOICES].previousPeriodInvoice.TotalAmount
-        if data[DATA_INVOICES].previousPeriodInvoice
-        else None,
-        attr_fn=lambda data: {
-            "Start date": data[DATA_INVOICES].previousPeriodInvoice.StartDate,
-            "Description": data[DATA_INVOICES].previousPeriodInvoice.PeriodDescription,
-        },
+        value_fn=lambda data: (
+            data[DATA_INVOICES].previousPeriodInvoice.TotalAmount
+            if data[DATA_INVOICES] is not None
+            and data[DATA_INVOICES].previousPeriodInvoice is not None
+            else None
+        ),
+        attr_fn=lambda data: (
+            {
+                "Start date": data[DATA_INVOICES].previousPeriodInvoice.StartDate,
+                "Description": data[
+                    DATA_INVOICES
+                ].previousPeriodInvoice.PeriodDescription,
+            }
+            if data[DATA_INVOICES] is not None
+            and data[DATA_INVOICES].previousPeriodInvoice is not None
+            else {}
+        ),
     ),
     FrankEnergieEntityDescription(
         key="invoice_current_period",
@@ -274,13 +298,23 @@ SENSOR_TYPES: tuple[FrankEnergieEntityDescription, ...] = (
         native_unit_of_measurement=CURRENCY_EURO,
         authenticated=True,
         service_name=SERVICE_NAME_COSTS,
-        value_fn=lambda data: data[DATA_INVOICES].currentPeriodInvoice.TotalAmount
-        if data[DATA_INVOICES].currentPeriodInvoice
-        else None,
-        attr_fn=lambda data: {
-            "Start date": data[DATA_INVOICES].currentPeriodInvoice.StartDate,
-            "Description": data[DATA_INVOICES].currentPeriodInvoice.PeriodDescription,
-        },
+        value_fn=lambda data: (
+            data[DATA_INVOICES].currentPeriodInvoice.TotalAmount
+            if data[DATA_INVOICES] is not None
+            and data[DATA_INVOICES].currentPeriodInvoice is not None
+            else None
+        ),
+        attr_fn=lambda data: (
+            {
+                "Start date": data[DATA_INVOICES].currentPeriodInvoice.StartDate,
+                "Description": data[
+                    DATA_INVOICES
+                ].currentPeriodInvoice.PeriodDescription,
+            }
+            if data[DATA_INVOICES] is not None
+            and data[DATA_INVOICES].currentPeriodInvoice is not None
+            else {}
+        ),
     ),
     FrankEnergieEntityDescription(
         key="invoice_upcoming_period",
@@ -290,13 +324,23 @@ SENSOR_TYPES: tuple[FrankEnergieEntityDescription, ...] = (
         native_unit_of_measurement=CURRENCY_EURO,
         authenticated=True,
         service_name=SERVICE_NAME_COSTS,
-        value_fn=lambda data: data[DATA_INVOICES].upcomingPeriodInvoice.TotalAmount
-        if data[DATA_INVOICES].upcomingPeriodInvoice
-        else None,
-        attr_fn=lambda data: {
-            "Start date": data[DATA_INVOICES].upcomingPeriodInvoice.StartDate,
-            "Description": data[DATA_INVOICES].upcomingPeriodInvoice.PeriodDescription,
-        },
+        value_fn=lambda data: (
+            data[DATA_INVOICES].upcomingPeriodInvoice.TotalAmount
+            if data[DATA_INVOICES] is not None
+            and data[DATA_INVOICES].upcomingPeriodInvoice is not None
+            else None
+        ),
+        attr_fn=lambda data: (
+            {
+                "Start date": data[DATA_INVOICES].upcomingPeriodInvoice.StartDate,
+                "Description": data[
+                    DATA_INVOICES
+                ].upcomingPeriodInvoice.PeriodDescription,
+            }
+            if data[DATA_INVOICES] is not None
+            and data[DATA_INVOICES].upcomingPeriodInvoice is not None
+            else {}
+        ),
     ),
 )
 
@@ -341,7 +385,9 @@ class FrankEnergieSensor(CoordinatorEntity, SensorEntity):
         if description.service_name is SERVICE_NAME_PRICES:
             device_info_identifiers = {(DOMAIN, f"{entry.entry_id}")}
         else:
-            device_info_identifiers = {(DOMAIN, f"{entry.entry_id}", description.service_name)}
+            device_info_identifiers = {
+                (DOMAIN, f"{entry.entry_id}", description.service_name)
+            }
 
         self._attr_device_info = DeviceInfo(
             identifiers=device_info_identifiers,
@@ -362,8 +408,15 @@ class FrankEnergieSensor(CoordinatorEntity, SensorEntity):
             self._attr_native_value = self.entity_description.value_fn(
                 self.coordinator.data
             )
-        except (TypeError, IndexError, ValueError):
-            # No data available
+        except (TypeError, IndexError, ValueError, AttributeError) as ex:
+            # No data available or data is None
+            if isinstance(ex, AttributeError):
+                # Log AttributeError specifically as it indicates missing data
+                _LOGGER.debug(
+                    "AttributeError in sensor %s: %s - data likely unavailable",
+                    self.entity_description.key,
+                    ex,
+                )
             self._attr_native_value = None
 
         # Cancel the currently scheduled event if there is any
