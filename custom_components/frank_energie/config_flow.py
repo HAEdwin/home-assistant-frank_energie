@@ -1,4 +1,5 @@
-"""Config flow for Picnic integration."""
+# pylint: disable=import-error
+"""Config flow for Frank Energie integration."""
 from __future__ import annotations
 
 import logging
@@ -102,14 +103,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self._async_create_entry(data)
 
-    async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> FlowResult:
+    async def async_step_reauth(self, _entry_data: Mapping[str, Any]) -> FlowResult:
         """Handle configuration by re-auth."""
+        # _entry_data is provided by Home Assistant but not used in this implementation
         self._reauth_entry = self.hass.config_entries.async_get_entry(
             self.context["entry_id"]
         )
         return await self.async_step_login()
 
-    async def _async_create_entry(self, data):
+    async def _async_create_entry(self, data: dict[str, Any]) -> FlowResult:
+        """Create config entry with the provided data."""
         await self.async_set_unique_id(data.get(CONF_USERNAME, "frank_energie"))
         self._abort_if_unique_id_configured()
 
