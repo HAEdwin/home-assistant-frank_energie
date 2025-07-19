@@ -1,13 +1,19 @@
 {
-  "domain": "frank_energie",
-  "name": "Frank Energie",
-  "config_flow": true,
-  "codeowners": ["@bajansen"],
-  "documentation": "https://github.com/bajansen/home-assistant-frank_energie",
-  "issue_tracker": "https://github.com/bajansen/home-assistant-frank_energie/issues",
-  "iot_class": "cloud_polling",
-  "requirements": [
-    "python-frank-energie>=2025.6.19,<2025.7.0"
-  ],
-  "version": "0.0.0"
+    "domain": "frank_energie",
+    "name": "Frank Energie",
+    "codeowners": [
+        "@HiDiHo01"
+    ],
+    "config_flow": true,
+    "documentation": "https://github.com/HiDiHo01/home-assistant-frank_energie",
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/HiDiHo01/home-assistant-frank_energie/issues",
+    "loggers": [
+        "frank_energie"
+    ],
+    "quality_scale": "silver",
+    "requirements": [
+        "python-frank-energie==2025.7.19"
+    ],
+    "version": "2025.7.19"
 }

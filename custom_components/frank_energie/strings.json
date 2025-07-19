@@ -2,8 +2,40 @@
   "config": {
     "step": {
       "user": {
+        "title": "Frank Energie configureren",
         "description": "[%key:common::config_flow::description::confirm_setup%]"
+      },
+      "confirm": {
+        "description": "[%key:common::config_flow::description::confirm_setup%]",
+        "title": "Frank Energie configureren"
+      },
+      "options": {
+        "title": "Opties configureren",
+        "description": "Configureer de opties voor Frank Energie."
+      },
+      "import": {
+        "title": "Importeer configuratie",
+        "description": "Importeer een bestaande configuratie voor Frank Energie."
+      },
+      "reauth_confirm": {
+        "title": "Her-authenticatie vereist",
+        "description": "Her-authenticatie is vereist voor Frank Energie."
+      },
+      "reauth": {
+        "title": "Her-authenticatie vereist",
+        "description": "Her-authenticatie is vereist voor Frank Energie."
+      },
+      "site": {
+        "title": "Selecteer leveringslocatie",
+        "description": "Kies de leveringslocatie die je toe wilt voegen."
       }
+    },
+    "error": {
+      "invalid_auth": "Ongeldige gebruikersnaam of wachtwoord.",
+      "connection_error": "Verbindingsfout met Frank Energie API.",
+      "no_delivery_sites": "Geen leveringslocaties gevonden voor dit account.",
+      "no_suitable_sites": "Geen geschikte leveringslocaties gevonden. Controleer of je account actieve leveringscontracten heeft.",
+      "site_retrieval_failed": "Fout bij het ophalen van leveringslocaties. Probeer het later opnieuw."
     },
     "abort": {
       "single_instance_allowed": "[%key:common::config_flow::abort::single_instance_allowed%]"
